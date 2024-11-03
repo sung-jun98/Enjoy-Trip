@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.mapper.AttractionMapper">
+
+    <!-- 시도, 구군 정보 조회 -->
+    <select id="selectSidoGugun" resultType="com.ssafy.model.dto.SidoGugunDto">
+        SELECT 
+            sidos.sido_code, 
+            sidos.sido_name, 
+            guguns.gugun_code, 
+            guguns.gugun_name 
+        FROM 
+            sidos 
+        JOIN 
+            guguns 
+        ON 
+            sidos.sido_code = guguns.sido_code
+    </select>
+
+    <!-- 시도, 구군, 관광지 이름 및 콘텐츠 타입으로 관광지 검색 -->
+    <select id="selectAttractionBySidoGugunTitle" resultType="com.ssafy.model.dto.AttractionDto">
+        SELECT DISTINCT 
+            a.* 
+        FROM 
+            attractions a 
+        JOIN 
+            sidos s 
+        ON 
+            a.area_code = s.sido_code 
+        JOIN 
+            guguns g 
+        ON 
+            s.sido_code = g.sido_code 
+            AND g.gugun_code = a.si_gun_gu_code 
+        WHERE 
+            s.sido_code = #{sido} 
+            AND g.gugun_code = #{gungu} 
+            AND a.title LIKE #{name}
+            <if test="contentTypeId != null and contentTypeId != 0">
+                AND a.content_type_id = #{contentTypeId}
+            </if>
+        LIMIT 10
+    </select>
+    
+    <!-- 시도, 구군, 콘텐츠 타입으로 관광지 검색 -->
+<select id="selectAttractionBySiGunguContentsType" resultType="com.ssafy.model.dto.AttractionDto">
+    SELECT DISTINCT 
+        a.* 
+    FROM 
+        attractions a 
+    JOIN 
+        contenttypes ct 
+    ON 
+        a.content_type_id = ct.content_type_id 
+    JOIN 
+        sidos s 
+    ON 
+        a.area_code = s.sido_code 
+    JOIN 
+        guguns g 
+    ON 
+        s.sido_code = g.sido_code 
+        AND g.gugun_code = a.si_gun_gu_code 
+    WHERE 
+        s.sido_name LIKE #{si} 
+        AND g.gugun_name LIKE #{gungu} 
+        AND ct.content_type_name LIKE #{type}
+    LIMIT 10
+</select>
+
+<!-- 관광지 이름으로 검색 -->
+<select id="selectAttractionByTitle" resultType="com.ssafy.model.dto.AttractionDto">
+    SELECT * 
+    FROM attractions 
+    WHERE title LIKE #{name} 
+    LIMIT 10
+</select>
+
+<!-- 시도, 구군, 관광지 이름으로 검색 -->
+<select id="selectAttractionBySiGunguTitle" resultType="com.ssafy.model.dto.AttractionDto">
+    SELECT DISTINCT 
+        a.* 
+    FROM 
+        attractions a 
+    JOIN 
+        sidos s 
+    ON 
+        a.area_code = s.sido_code 
+    JOIN 
+        guguns g 
+    ON 
+        s.sido_code = g.sido_code 
+        AND g.gugun_code = a.si_gun_gu_code 
+    WHERE 
+        s.sido_code = #{sido} 
+        AND g.gugun_code = #{gungu} 
+        AND a.title LIKE #{name}
+        <if test="contentTypeId != null and contentTypeId != 0">
+            AND a.content_type_id = #{contentTypeId}
+        </if>
+    LIMIT 10
+</select>
+
+<!-- 시도, 구군으로 관광지 검색 -->
+<select id="selectAttractionBySiGungu" resultType="com.ssafy.model.dto.AttractionDto">
+    SELECT * 
+    FROM attractions a 
+    JOIN sidos s 
+    ON a.area_code = s.sido_code 
+    JOIN guguns g 
+    ON s.sido_code = g.sido_code 
+        AND g.gugun_code = a.si_gun_gu_code 
+    WHERE 
+        s.sido_name LIKE #{si} 
+        AND g.gugun_name LIKE #{gungu} 
+    LIMIT 10
+</select>
+
+<!-- 구군으로 관광지 검색 -->
+<select id="selectAttractionByGungu" resultType="com.ssafy.model.dto.AttractionDto">
+    SELECT * 
+    FROM attractions a 
+    JOIN sidos s 
+    ON a.area_code = s.sido_code 
+    JOIN guguns g 
+    ON s.sido_code = g.sido_code 
+        AND g.gugun_code = a.si_gun_gu_code 
+    WHERE 
+        g.gugun_name LIKE #{gungu} 
+    LIMIT 10
+</select>
+    
+    
+
+</mapper>
